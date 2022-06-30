@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/zhaoziqi/go/src/github.com/fatsheep9146/awesome-observability/demos/otel-metric-exporter-prometheus'
+make: Leaving directory `/Users/zhaoziqi/go/src/github.com/fatsheep9146/awesome-observability/demos/otel-metric-exporter-prometheus'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+
