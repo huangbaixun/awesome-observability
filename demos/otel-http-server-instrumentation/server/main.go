@@ -6,23 +6,19 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
-
+	otelprom "go.opentelemetry.io/otel/exporters/prometheus"
 	stdouttrace "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-
-	stdoutmetric "go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
-	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
-	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
-	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
-	"go.opentelemetry.io/otel/sdk/metric/selector/simple"
+	"go.opentelemetry.io/otel/sdk/metric"
+	sdkmeter "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
 func initTraceProvider() (*sdktrace.TracerProvider, error) {
@@ -41,34 +37,19 @@ func initTraceProvider() (*sdktrace.TracerProvider, error) {
 	return tp, err
 }
 
-func initMeterProvider() (metric.MeterProvider, error) {
-	ctx := context.Background()
-	exporter, err := stdoutmetric.New(stdoutmetric.WithPrettyPrint())
-	if err != nil {
-		return nil, err
-	}
+func initMeterProvider() (mp *sdkmeter.MeterProvider, err error) {
+	exporter := otelprom.New()
+	mp = sdkmeter.NewMeterProvider(metric.WithReader(exporter))
+	global.SetMeterProvider(mp)
 
-	controller := controller.New(
-		processor.NewFactory(
-			simple.NewWithHistogramDistribution(),
-			exporter,
-		),
-		controller.WithExporter(exporter),
-		controller.WithCollectPeriod(2*time.Second),
-	)
-
-	err = controller.Start(ctx)
-	if err != nil {
-		log.Fatalf("failed to start metric controller, %v", err)
-	}
-	global.SetMeterProvider(controller)
-	return controller, nil
+	go serveMetrics(exporter.Collector)
+	return
 }
 
 func main() {
 	tp, err := initTraceProvider()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("initTraceProvider failed: %v", err)
 	}
 	defer func() {
 		if err := tp.Shutdown(context.Background()); err != nil {
@@ -76,7 +57,15 @@ func main() {
 		}
 	}()
 
-	initMeterProvider()
+	mp, err := initMeterProvider()
+	if err != nil {
+		log.Fatalf("initMeterProvider failed: %v", err)
+	}
+	defer func() {
+		if err := mp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down meter provider: %v", err)
+		}
+	}()
 
 	fooHandler := func(w http.ResponseWriter, req *http.Request) {
 		fmt.Println("got foo, return bar")
@@ -89,5 +78,22 @@ func main() {
 	log.Println("start server")
 	if err = http.ListenAndServe(":6666", nil); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func serveMetrics(collector prometheus.Collector) {
+	registry := prometheus.NewRegistry()
+	err := registry.Register(collector)
+	if err != nil {
+		fmt.Printf("error registering collector: %v", err)
+		return
+	}
+
+	log.Printf("serving metrics at localhost:2222/metrics")
+	http.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
+	err = http.ListenAndServe(":2222", nil)
+	if err != nil {
+		fmt.Printf("error serving http: %v", err)
+		return
 	}
 }
