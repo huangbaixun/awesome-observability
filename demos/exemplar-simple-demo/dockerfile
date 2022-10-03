@@ -1,0 +1,3 @@
+FROM golang:1.18.6 AS base 
+RUN go build -o demo-http-server ./server/*.go
+CMD ["/go/bin/demo-http-server"]

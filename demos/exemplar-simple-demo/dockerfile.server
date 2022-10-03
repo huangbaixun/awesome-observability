@@ -1,0 +1,5 @@
+FROM golang:1.18-alpine
+
+COPY http-server /usr/bin
+
+CMD ["http-server"]
