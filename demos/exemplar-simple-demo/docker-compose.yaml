@@ -7,7 +7,7 @@ networks:
 
 services:
   http-server:
-    image: fatsheep9146/demo-http-server:v0.1
+    image: fatsheep9146/demo-http-server:v0.1 
     # build:
     #   dockerfile: $PWD/Dockerfile
     #   context: ../../../../..

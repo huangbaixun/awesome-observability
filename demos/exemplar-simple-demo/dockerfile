@@ -1,3 +1,11 @@
 FROM golang:1.18.6 AS base 
-RUN go build -o demo-http-server ./server/*.go
-CMD ["/go/bin/demo-http-server"]
+WORKDIR /usr/src/app/
+COPY ./ ./
+RUN go build -o http-server ./server/*.go
+
+FROM golang:1.18.6
+WORKDIR /usr/src/app/
+COPY --from=base /usr/src/app/http-server ./
+ENTRYPOINT [ "./http-server" ]
+
+
