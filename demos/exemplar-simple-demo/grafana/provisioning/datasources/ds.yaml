@@ -10,3 +10,8 @@ datasources:
     type: prometheus
     url: http://prometheus:9090
     editable: true
+    jsonData:
+      httpMethod: POST
+      exemplarTraceIdDestinations:
+      - name: traceID
+        datasourceUid: tempo

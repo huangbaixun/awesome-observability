@@ -43,7 +43,7 @@ func initStdoutSpanExporter() (sdktrace.SpanExporter, error) {
 
 func initTracerProvider() func() {
 	ctx := context.Background()
-	spanExporter, err := initStdoutSpanExporter()
+	spanExporter, err := initOtlpSpanExporter()
 	if err != nil {
 		log.Fatalf("init span exporter failed: %v\n", err)
 	}

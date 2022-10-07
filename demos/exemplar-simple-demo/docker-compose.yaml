@@ -7,11 +7,10 @@ networks:
 
 services:
   http-server:
-    image: fatsheep9146/demo-http-server:v0.1 
-    # build:
-    #   dockerfile: $PWD/Dockerfile
-    #   context: ../../../../..
-    #   target: demo-http-server
+    image: fatsheep9146/demo-http-server:v0.1.1
+    build:
+      dockerfile: ./dockerfile
+      target: http-server
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=tempo:4317
     ports:
