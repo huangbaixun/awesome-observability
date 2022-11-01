@@ -1,0 +1,30 @@
+version: "3.7"
+
+networks:
+  default:
+    name: demo
+    driver: bridge
+
+services:
+  server:
+    image: fatsheep9146/demo:prometheus-histogram
+    build:
+      dockerfile: ./dockerfile
+      target: server
+    ports:
+      - "8888:8888"
+
+  prometheus:
+    image: quay.io/prometheus/prometheus:v2.34.0
+    command:
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --storage.tsdb.retention.time=1h
+      - --config.file=/etc/prometheus/prometheus-config.yaml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
+    volumes:
+      - ./prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
+    ports:
+      - "9090:9090"
