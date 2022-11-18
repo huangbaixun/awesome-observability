@@ -20,32 +20,28 @@ func main() {
 	defer shutdown()
 	log.Println("init tracer provider done")
 
+	var count int = 0
+	var sleep float64
+
 	handler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		starttime := time.Now()
+		count++
 
-		var sleep int64
-		switch modulus := time.Now().Unix() % 5; modulus {
-		case 0:
-			sleep = rng.Int63n(2000)
-		case 1:
-			sleep = rng.Int63n(15)
-		case 2:
-			sleep = rng.Int63n(917)
-		case 3:
-			sleep = rng.Int63n(87)
-		case 4:
-			sleep = rng.Int63n(1173)
+		if count%10 == 0 {
+			sleep = 5
+		} else {
+			sleep = rng.Float64() / 10
 		}
-		time.Sleep(time.Duration(sleep) * time.Millisecond)
+		time.Sleep(time.Duration(sleep) * time.Second)
 
 		ctx := req.Context()
 		traceId := trace.SpanContextFromContext(ctx).TraceID()
-		log.Printf("found trace id %v\n", traceId.String())
 
-		if _, err := w.Write([]byte("Hello World")); err != nil {
+		if _, err := w.Write([]byte("world")); err != nil {
 			http.Error(w, "write operation failed.", http.StatusInternalServerError)
 			return
 		}
+
 		log.Printf("request use %v seconds\n", float64(time.Since(starttime))/float64(time.Second))
 		requestDurationsHistogram.(prometheus.ExemplarObserver).ObserveWithExemplar(float64(time.Since(starttime))/float64(time.Second), prometheus.Labels{
 			"traceID": traceId.String(),
