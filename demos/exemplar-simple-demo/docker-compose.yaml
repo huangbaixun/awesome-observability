@@ -7,14 +7,24 @@ networks:
 
 services:
   http-server:
-    image: fatsheep9146/demo-http-server:v0.1.1
+    image: fatsheep9146/demo-http-server:c3b8318c
     build:
-      dockerfile: ./dockerfile
+      dockerfile: ./dockerfile.server
       target: http-server
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=tempo:4317
     ports:
       - "7777:7777"
+    depends_on:
+      - tempo
+
+  http-client:
+    image: fatsheep9146/demo-http-client:c3b8318c
+    build:
+      dockerfile: ./dockerfile.client
+      target: http-client
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=tempo:4317
     depends_on:
       - tempo
 

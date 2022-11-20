@@ -53,7 +53,7 @@ func initTracerProvider() func() {
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			// the service name used to display traces in backends
-			semconv.ServiceNameKey.String("demo-server"),
+			semconv.ServiceNameKey.String("demo-client"),
 		),
 	)
 	if err != nil {

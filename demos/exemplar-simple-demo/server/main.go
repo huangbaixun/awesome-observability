@@ -15,6 +15,7 @@ import (
 var rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func main() {
+	time.Sleep(3 * time.Second)
 	// init opentelemetry trace provider
 	shutdown := initTracerProvider()
 	defer shutdown()

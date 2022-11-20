@@ -1,0 +1,9 @@
+FROM golang:1.18.6 AS base 
+WORKDIR /usr/src/app/
+COPY ./ ./
+RUN go build -o http-client ./client/*.go
+
+FROM golang:1.18.6 AS http-client
+WORKDIR /usr/src/app/
+COPY --from=base /usr/src/app/http-client ./
+ENTRYPOINT [ "./http-client" ]

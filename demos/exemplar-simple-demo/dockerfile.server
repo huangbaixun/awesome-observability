@@ -1,5 +1,9 @@
-FROM golang:1.18-alpine
+FROM golang:1.18.6 AS base 
+WORKDIR /usr/src/app/
+COPY ./ ./
+RUN go build -o http-server ./server/*.go
 
-COPY http-server /usr/bin
-
-CMD ["http-server"]
+FROM golang:1.18.6 AS http-server
+WORKDIR /usr/src/app/
+COPY --from=base /usr/src/app/http-server ./
+ENTRYPOINT [ "./http-server" ]
