@@ -7,7 +7,7 @@ networks:
 
 services:
   http-server:
-    image: fatsheep9146/demo-http-server:v1.6
+    image: fatsheep9146/demo-http-server:v1.7
     build:
       dockerfile: ./dockerfile.server
       target: http-server
@@ -19,7 +19,7 @@ services:
       - tempo
 
   http-client:
-    image: fatsheep9146/demo-http-client:v1.6
+    image: fatsheep9146/demo-http-client:v1.7
     build:
       dockerfile: ./dockerfile.client
       target: http-client

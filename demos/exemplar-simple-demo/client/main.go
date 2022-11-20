@@ -42,6 +42,6 @@ func main() {
 		}
 
 		fmt.Printf("response received: %s\n\n\n", body)
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 }

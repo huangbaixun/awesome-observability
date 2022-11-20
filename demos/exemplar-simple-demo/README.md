@@ -1,9 +1,28 @@
 
-# Build
+# Overview
 
-GOOS=linux GOARCH=amd64 go build -o http-server server/*.go
-docker rmi fatsheep9146/demo-http-server:v0.1
-docker build -t fatsheep9146/demo-http-server:v0.1 -f dockerfile.server .
+A simple demo to show how to use exemplar, which only includes a simple http server.
+
+# Usage 
+
+start 
+
+```
+docker compose up --no-build -d
+```
+
+stop
+
+```
+docker compose stop 
+docker compose rm -f
+```
+
+demo server dashboard
+
+http://127.0.0.1:3000/d/fOpOPcO4k/demo-server?orgId=1&from=now-5m&to=now
+
+demo 
 
 # Ref
 
