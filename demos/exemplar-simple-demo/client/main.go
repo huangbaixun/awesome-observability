@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	time.Sleep(5 * time.Second)
+	time.Sleep(10 * time.Second)
 	// init opentelemetry trace provider
 	shutdown := initTracerProvider()
 	defer shutdown()
@@ -29,7 +29,7 @@ func main() {
 		err := func(ctx context.Context) error {
 			ctx, span := tr.Start(ctx, "say hello")
 			defer span.End()
-			req, _ := http.NewRequestWithContext(ctx, "GET", "http://localhost:7777/hello", nil)
+			req, _ := http.NewRequestWithContext(ctx, "GET", "http://http-server:7777/hello", nil)
 
 			fmt.Printf("sending request...\n")
 			res, err := client.Do(req)
