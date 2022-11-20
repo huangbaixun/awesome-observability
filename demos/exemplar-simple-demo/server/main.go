@@ -28,8 +28,8 @@ func main() {
 		starttime := time.Now()
 		count++
 
-		if count%10 == 0 {
-			sleep = 5
+		if count%100 == 0 {
+			sleep = 1
 		} else {
 			sleep = rng.Float64() / 10
 		}
