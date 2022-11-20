@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-
-	"go.opentelemetry.io/otel"
 )
 
 func main() {
@@ -24,11 +22,8 @@ func main() {
 	ctx := context.Background()
 	var body []byte
 
-	tr := otel.Tracer("demo-client-hello")
 	for {
 		err := func(ctx context.Context) error {
-			ctx, span := tr.Start(ctx, "say hello")
-			defer span.End()
 			req, _ := http.NewRequestWithContext(ctx, "GET", "http://http-server:7777/hello", nil)
 
 			fmt.Printf("sending request...\n")

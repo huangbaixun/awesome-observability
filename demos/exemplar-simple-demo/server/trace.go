@@ -60,11 +60,10 @@ func initTracerProvider() func() {
 		log.Fatalf("failed to create resource: %v\n", err)
 	}
 
-	bsp := sdktrace.NewBatchSpanProcessor(spanExporter)
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithResource(res),
-		sdktrace.WithSpanProcessor(bsp),
+		sdktrace.WithBatcher(spanExporter),
 	)
 
 	// set global propagator to tracecontext (the default is no-op).
