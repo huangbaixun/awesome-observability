@@ -1,0 +1,46 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+featureGates:
+  APIServerTracing: true
+  KubeletTracing: true
+nodes:
+- role: control-plane
+  # image: kindest/node:v1.25.3
+  image: fatsheep9146/kindnode:v1.27.0-alpha.0.56_3e26e104bdf9d0
+  extraPortMappings:
+  - containerPort: 16686
+    hostPort: 16686
+    protocol: TCP
+  # mount local to kind
+  extraMounts:
+    - hostPath: ./trace-config.yaml
+      containerPath: /etc/trace-config.yaml
+    - hostPath: ./otel-collector.yaml
+      containerPath: /etc/kubernetes/manifests/otel-collector.yaml
+    - hostPath: ./otel-config.yaml
+      containerPath: /etc/otel-config.yaml
+    - hostPath: ./jaeger.yaml
+      containerPath: /etc/kubernetes/manifests/jaeger.yaml
+  kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      extraArgs:
+        tracing-config-file: /etc/trace-config.yaml
+      extraVolumes:
+      - name: trace-config
+        hostPath: /etc/trace-config.yaml
+        mountPath: /etc/trace-config.yaml
+        pathType: File
+    etcd:
+      local:
+        extraArgs:
+          experimental-enable-distributed-tracing: "true"
+          experimental-distributed-tracing-address: "localhost:14317"
+          experimental-distributed-tracing-service-name: etcd
+  - |
+    kind: KubeletConfiguration
+    tracing:
+      endpoint: localhost:14317
+      samplingRatePerMillion: 10000 
+        

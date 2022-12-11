@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: jaeger
+  name: jaeger
+  namespace: kube-system
+spec:
+  containers:
+  - args:
+    - --memory.max-traces=10000
+    image: jaegertracing/all-in-one
+    imagePullPolicy: IfNotPresent
+    name: jaeger
+    env:
+    - name: COLLECTOR_OTLP_ENABLED
+      value: "true"
+  hostNetwork: true
+  priorityClassName: system-node-critical

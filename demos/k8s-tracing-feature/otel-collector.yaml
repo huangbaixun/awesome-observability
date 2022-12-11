@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: otel-collector
+  name: otel-collector
+  namespace: kube-system
+spec:
+  containers:
+  - args:
+    - --config=/etc/otel-config.yaml
+    image: otel/opentelemetry-collector-contrib:0.61.0
+    imagePullPolicy: IfNotPresent
+    name: otel-collector
+    volumeMounts:
+    - mountPath: /etc/otel-config.yaml
+      name: config
+      readOnly: true
+  hostNetwork: true
+  priorityClassName: system-node-critical
+  volumes:
+  - hostPath:
+      path: /etc/otel-config.yaml
+      type: File
+    name: config

@@ -1,0 +1,18 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:14317
+exporters:
+  # Replace this exporter with the exporter for your backend
+  otlp:
+    endpoint: 0.0.0.0:4317
+    tls:
+      insecure: true
+  logging:
+    # logLevel: debug
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging,otlp]
