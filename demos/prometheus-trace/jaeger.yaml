@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: jaeger
+  name: jaeger
+  namespace: kube-system
+spec:
+  containers:
+  - args:
+    - --memory.max-traces=10000
+    - --prometheus.server-url=http://127.0.0.1:9090
+    image: fatsheep9146/jaegertracing-all-in-one:1.42.0
+    imagePullPolicy: IfNotPresent
+    name: jaeger
+    env:
+    - name: COLLECTOR_OTLP_ENABLED
+      value: "true"
+    - name: METRICS_STORAGE_TYPE
+      value: prometheus
+  hostNetwork: true
+  priorityClassName: system-node-critical
