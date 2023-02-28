@@ -1,0 +1,38 @@
+version: "3.7"
+
+networks:
+  default:
+    name: demo
+    driver: bridge
+
+services:
+  # test:
+  #   image: xx
+  #   command: 
+  #   - --config.file=/etc/phlare/config.yaml
+  #   volumes:
+  #   - ./phlare/config.yaml:/etc/phlare/config.yaml
+  #   environment:
+  #   - COLLECTOR_OTLP_ENABLED=true
+  #   ports:
+  #   - "4100:4100"
+
+# frequently used service
+  opentelemetry-collector:
+    image: otel/opentelemetry-collector-contrib:0.72.0
+    command:
+      - --config.file=/etc/phlare/config.yaml
+    volumes:
+      - ./phlare/config.yaml:/etc/phlare/config.yaml
+    ports:
+      - "4100:4100"
+
+  jaeger:
+    image: jaegertracing/opentelemetry-all-in-one:1.42.0
+    command: 
+    - --memory.max-traces=10000
+    environment:
+    - COLLECTOR_OTLP_ENABLED=true
+    ports:
+    - "4317:4317"
+    - "16686:16686"
