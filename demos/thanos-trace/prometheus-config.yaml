@@ -1,0 +1,18 @@
+global:
+  evaluation_interval: 30s
+  scrape_interval: 5s
+  external_labels:
+    instance: prometheus-0
+
+# tracing:
+#   endpoint: jaeger:4317
+#   sampling_fraction: 1
+#   insecure: true
+
+scrape_configs:
+# ref: https://github.com/prometheus/prometheus/blob/release-2.42/documentation/examples/prometheus-kubernetes.yml
+  - job_name: "test"
+    static_configs:
+    - targets:
+      - "avalanche:9001"
+  
