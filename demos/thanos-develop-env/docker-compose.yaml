@@ -27,10 +27,12 @@ services:
     image: quay.io/thanos/thanos:v0.31.0-rc.0
     volumes:
     - prometheus-0-db:/prometheus
+    - ./trace-config.yaml:/etc/trace-config.yaml
     command: 
     - sidecar
     - --tsdb.path=/prometheus
     - --prometheus.url=http://prometheus-0:9090 
+    - --tracing.config-file=/etc/trace-config.yaml
     expose:
       - 10901
     depends_on:
@@ -42,6 +44,10 @@ services:
     - query
     - --http-address=0.0.0.0:10900
     - --store=thanos-sidecar-0:10901
+    - --tracing.config-file=/etc/trace-config.yaml
+    - --query.promql-engine=thanos
+    volumes:
+    - ./trace-config.yaml:/etc/trace-config.yaml
     ports:
     - "10900:10900"
 
